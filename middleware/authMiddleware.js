@@ -11,7 +11,11 @@ module.exports = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+<<<<<<< HEAD
     // Busca o usuário completo no banco para ter nome e email disponíveis nas views
+=======
+    
+>>>>>>> 380b667e78c393617802902ac8bb37d7139e124a
     const user = await User.findByPk(decoded.id, { attributes: ['id', 'nome', 'email'] });
     if (!user) {
       res.clearCookie('token');
@@ -19,7 +23,11 @@ module.exports = async (req, res, next) => {
     }
 
     req.user = user;
+<<<<<<< HEAD
     res.locals.user = user; // Disponível em todos os templates EJS
+=======
+    res.locals.user = user;
+>>>>>>> 380b667e78c393617802902ac8bb37d7139e124a
     next();
   } catch (error) {
     res.clearCookie('token');

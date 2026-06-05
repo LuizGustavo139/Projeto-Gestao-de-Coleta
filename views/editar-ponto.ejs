@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Agendamento - Coleta Seletiva</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('./partials/navbar') %>
+  <div class="container">
+    <h2>✏️ Alterar Agendamento</h2>
+
+    <form action="/pontos/editar/<%= agendamento.id %>" method="POST" class="form-card">
+      <div class="form-group">
+        <label for="pontoColetaId">Ponto de Coleta *</label>
+        <select id="pontoColetaId" name="pontoColetaId" required>
+          <% pontos.forEach(ponto => { %>
+            <option value="<%= ponto.id %>" <%= agendamento.PontoColetaId === ponto.id ? 'selected' : '' %>>
+              <%= ponto.nomePonto %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="residuoId">Tipo de Resíduo *</label>
+        <select id="residuoId" name="residuoId" required>
+          <% residuos.forEach(res => { %>
+            <option value="<%= res.id %>" <%= agendamento.ResiduoId === res.id ? 'selected' : '' %>>
+              <%= res.nomeResiduo %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="endereco">Endereço *</label>
+        <input type="text" id="endereco" name="endereco"
+               value="<%= agendamento.endereco %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="dataHora">Data e Hora *</label>
+        <input type="datetime-local" id="dataHora" name="dataHora"
+               value="<%= new Date(agendamento.dataHora).toISOString().slice(0,16) %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status *</label>
+        <select id="status" name="status" required>
+          <option value="Pendente" <%= agendamento.status === 'Pendente' ? 'selected' : '' %>>Pendente</option>
+          <option value="Em Andamento" <%= agendamento.status === 'Em Andamento' ? 'selected' : '' %>>Em Andamento</option>
+          <option value="Concluído" <%= agendamento.status === 'Concluído' ? 'selected' : '' %>>Concluído</option>
+          <option value="Cancelado" <%= agendamento.status === 'Cancelado' ? 'selected' : '' %>>Cancelado</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <a href="/pontos" class="btn btn-secondary">Voltar</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

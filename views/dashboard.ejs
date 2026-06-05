@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Coleta Seletiva</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('./partials/navbar') %>
+
+  <div class="container">
+    <div class="page-header">
+      <h2>Olá, <%= user.nome %>! 👋</h2>
+      <a href="/pontos/novo" class="btn btn-primary">📅 Novo Agendamento</a>
+    </div>
+
+    <div class="cards-row">
+      <div class="card">
+        <h3>📍 Pontos de Coleta Disponíveis</h3>
+        <ul>
+          <% pontos.forEach(ponto => { %>
+            <li>
+              <strong><%= ponto.nomePonto %></strong><br>
+              <span class="text-muted">🗺️ <%= ponto.endereco %></span><br>
+              <span class="badge">♻️ <%= ponto.residuosAceitos %></span>
+            </li>
+          <% }) %>
+        </ul>
+        <a href="/pontos-coleta" class="link-small">Gerenciar pontos →</a>
+      </div>
+
+      <div class="card">
+        <h3>♻️ Tipos de Resíduos</h3>
+        <ul>
+          <% residuos.forEach(res => { %>
+            <li>
+              <strong><%= res.nomeResiduo %></strong>: <%= res.descricao %>
+            </li>
+          <% }) %>
+        </ul>
+        <a href="/residuos" class="link-small">Gerenciar resíduos →</a>
+      </div>
+    </div>
+
+    <hr>
+
+    <h3>📋 Meus Agendamentos</h3>
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Ponto de Coleta</th>
+          <th>Tipo de Resíduo</th>
+          <th>Endereço de Descarte</th>
+          <th>Data / Hora</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% agendamentos.forEach(agendamento => { %>
+          <tr>
+            <td><strong><%= agendamento.pontoColeta ? agendamento.pontoColeta.nomePonto : '—' %></strong></td>
+            <td><%= agendamento.residuo ? agendamento.residuo.nomeResiduo : '—' %></td>
+            <td><%= agendamento.endereco %></td>
+            <td><%= new Date(agendamento.dataHora).toLocaleString('pt-BR') %></td>
+            <td>
+              <span class="status-badge status-<%= agendamento.status.toLowerCase().replace(' ', '-') %>">
+                <%= agendamento.status %>
+              </span>
+            </td>
+            <td>
+              <a href="/pontos/editar/<%= agendamento.id %>" class="btn btn-sm btn-edit">Editar</a>
+              <a href="/pontos/deletar/<%= agendamento.id %>" class="btn btn-sm btn-danger"
+                 onclick="return confirm('Cancelar este agendamento?')">Cancelar</a>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (agendamentos.length === 0) { %>
+          <tr>
+            <td colspan="6" class="empty-msg">Você não possui nenhuma coleta agendada no momento.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
