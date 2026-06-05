@@ -1,7 +1,6 @@
 const { PontoColeta } = require('../models');
 
 module.exports = {
-  // Listar todos os pontos
   getAll: async (req, res) => {
     try {
       const pontos = await PontoColeta.findAll();
@@ -12,12 +11,12 @@ module.exports = {
     }
   },
 
-  // Tela de cadastro
+  
   renderCreate: (req, res) => {
     res.render('pontos-coleta/form', { ponto: null, erro: null });
   },
 
-  // Salvar novo ponto
+  
   create: async (req, res) => {
     try {
       const { nomePonto, endereco, residuosAceitos } = req.body;
@@ -31,9 +30,7 @@ module.exports = {
       res.render('pontos-coleta/form', { ponto: null, erro: 'Erro ao salvar. Tente novamente.' });
     }
   },
-
-  // Tela de edição
-  renderEdit: async (req, res) => {
+    renderEdit: async (req, res) => {
     try {
       const ponto = await PontoColeta.findByPk(req.params.id);
       if (!ponto) return res.redirect('/pontos-coleta');
@@ -42,9 +39,7 @@ module.exports = {
       console.error('Erro ao buscar ponto:', err);
       res.status(500).send('Erro ao carregar edição.');
     }
-  },
-
-  // Atualizar ponto
+  }
   update: async (req, res) => {
     try {
       const { nomePonto, endereco, residuosAceitos } = req.body;
@@ -62,8 +57,6 @@ module.exports = {
       res.status(500).send('Erro ao atualizar.');
     }
   },
-
-  // Remover ponto
   delete: async (req, res) => {
     try {
       await PontoColeta.destroy({ where: { id: req.params.id } });
