@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Novo Agendamento - Coleta Seletiva</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('./partials/navbar') %>
+  <div class="container">
+    <h2>📅 Solicitar Novo Agendamento de Coleta</h2>
+
+    <form action="/pontos/novo" method="POST" class="form-card">
+      <div class="form-group">
+        <label for="pontoColetaId">1. Ponto de Coleta *</label>
+        <select id="pontoColetaId" name="pontoColetaId" required>
+          <option value="" disabled selected>Selecione um ponto...</option>
+          <% pontos.forEach(ponto => { %>
+            <option value="<%= ponto.id %>"><%= ponto.nomePonto %> — <%= ponto.endereco %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="residuoId">2. Tipo de Resíduo *</label>
+        <select id="residuoId" name="residuoId" required>
+          <option value="" disabled selected>Selecione o resíduo...</option>
+          <% residuos.forEach(res => { %>
+            <option value="<%= res.id %>"><%= res.nomeResiduo %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="endereco">3. Endereço de Retirada/Descarte *</label>
+        <input type="text" id="endereco" name="endereco"
+               placeholder="Ex: Rua das Flores, n° 100" required>
+      </div>
+
+      <div class="form-group">
+        <label for="dataHora">4. Data e Hora da Coleta *</label>
+        <input type="datetime-local" id="dataHora" name="dataHora" required>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">✅ Confirmar Agendamento</button>
+        <a href="/pontos" class="btn btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
