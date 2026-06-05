@@ -1,6 +1,4 @@
-/* ============================================
-   Sistema de Gestão de Coleta Seletiva Urbana
-   ============================================ */
+
 
 * {
   box-sizing: border-box;
@@ -15,7 +13,7 @@ body {
   min-height: 100vh;
 }
 
-/* ---- Navbar ---- */
+
 .navbar {
   background-color: #2e7d32;
   color: white;
@@ -56,14 +54,14 @@ body {
 }
 .btn-logout:hover { background: #b71c1c; }
 
-/* ---- Container ---- */
+
 .container {
   max-width: 1100px;
   margin: 30px auto;
   padding: 0 20px;
 }
 
-/* ---- Page Header ---- */
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -72,7 +70,7 @@ body {
 }
 .page-header h2 { font-size: 1.5rem; color: #1b5e20; }
 
-/* ---- Cards Row ---- */
+
 .cards-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -93,7 +91,7 @@ body {
 .link-small { font-size: 0.82rem; color: #2e7d32; text-decoration: none; display: inline-block; margin-top: 10px; }
 .link-small:hover { text-decoration: underline; }
 
-/* ---- Tabela ---- */
+
 .tabela {
   width: 100%;
   border-collapse: collapse;
@@ -119,7 +117,7 @@ body {
 .tabela tr:last-child td { border-bottom: none; }
 .tabela tr:hover td { background-color: #f9fbe7; }
 
-/* ---- Status Badges ---- */
+
 .status-badge {
   display: inline-block;
   padding: 3px 10px;
@@ -132,7 +130,7 @@ body {
 .status-conclu\00EDdo, .status-concluído { background: #e8f5e9; color: #1b5e20; }
 .status-cancelado { background: #fce4ec; color: #b71c1c; }
 
-/* ---- Buttons ---- */
+
 .btn {
   display: inline-block;
   padding: 8px 18px;
@@ -156,7 +154,7 @@ body {
 .btn-lg { padding: 12px 28px; font-size: 1rem; }
 .btn-block { width: 100%; text-align: center; display: block; }
 
-/* ---- Forms ---- */
+
 .form-card {
   background: white;
   padding: 28px;
@@ -193,7 +191,7 @@ body {
 }
 .form-actions { display: flex; gap: 12px; margin-top: 8px; }
 
-/* ---- Messages ---- */
+
 .error-msg {
   color: #c62828;
   background: #fce4ec;
@@ -210,7 +208,7 @@ body {
   font-style: italic;
 }
 
-/* ---- Misc ---- */
+
 .text-muted { color: #666; font-size: 0.85rem; }
 .badge {
   display: inline-block;
@@ -222,7 +220,7 @@ body {
 }
 hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
 
-/* ---- Hero (Landing) ---- */
+
 .hero {
   min-height: 100vh;
   background: linear-gradient(135deg, #1b5e20 0%, #388e3c 50%, #66bb6a 100%);
@@ -240,7 +238,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
 .hero-actions .btn-secondary { background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.5); }
 .hero-actions .btn-secondary:hover { background: rgba(255,255,255,0.3); }
 
-/* ---- Auth Pages ---- */
+
 .auth-page {
   min-height: 100vh;
   display: flex;
