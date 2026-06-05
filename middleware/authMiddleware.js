@@ -11,7 +11,7 @@ module.exports = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Busca o usuário completo no banco para ter nome e email disponíveis nas views
+    
     const user = await User.findByPk(decoded.id, { attributes: ['id', 'nome', 'email'] });
     if (!user) {
       res.clearCookie('token');
@@ -19,7 +19,7 @@ module.exports = async (req, res, next) => {
     }
 
     req.user = user;
-    res.locals.user = user; // Disponível em todos os templates EJS
+    res.locals.user = user;
     next();
   } catch (error) {
     res.clearCookie('token');
