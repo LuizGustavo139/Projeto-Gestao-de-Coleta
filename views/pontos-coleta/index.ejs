@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Pontos de Coleta - Coleta Seletiva</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  <div class="container">
+    <div class="page-header">
+      <h2>📍 Pontos de Coleta</h2>
+      <a href="/pontos-coleta/novo" class="btn btn-primary">+ Novo Ponto</a>
+    </div>
+
+    <% if (pontos.length === 0) { %>
+      <p class="empty-msg">Nenhum ponto de coleta cadastrado ainda.</p>
+    <% } else { %>
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Endereço</th>
+            <th>Resíduos Aceitos</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% pontos.forEach(ponto => { %>
+            <tr>
+              <td><%= ponto.id %></td>
+              <td><strong><%= ponto.nomePonto %></strong></td>
+              <td><%= ponto.endereco %></td>
+              <td><%= ponto.residuosAceitos %></td>
+              <td>
+                <a href="/pontos-coleta/editar/<%= ponto.id %>" class="btn btn-sm btn-edit">Editar</a>
+                <a href="/pontos-coleta/deletar/<%= ponto.id %>" class="btn btn-sm btn-danger"
+                   onclick="return confirm('Remover este ponto de coleta?')">Remover</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>
