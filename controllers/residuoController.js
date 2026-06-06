@@ -1,4 +1,4 @@
-const { Residuo } = require('../../models');
+const { Residuo } = require('../models');
 
 module.exports = {
   
