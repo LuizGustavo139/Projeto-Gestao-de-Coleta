@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Resíduos - Coleta Seletiva</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  <div class="container">
+    <div class="page-header">
+      <h2>♻️ Tipos de Resíduos</h2>
+      <a href="/residuos/novo" class="btn btn-primary">+ Novo Resíduo</a>
+    </div>
+
+    <% if (residuos.length === 0) { %>
+      <p class="empty-msg">Nenhum resíduo cadastrado ainda.</p>
+    <% } else { %>
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% residuos.forEach(res => { %>
+            <tr>
+              <td><%= res.id %></td>
+              <td><strong><%= res.nomeResiduo %></strong></td>
+              <td><%= res.descricao || '—' %></td>
+              <td>
+                <a href="/residuos/editar/<%= res.id %>" class="btn btn-sm btn-edit">Editar</a>
+                <a href="/residuos/deletar/<%= res.id %>" class="btn btn-sm btn-danger"
+                   onclick="return confirm('Remover este resíduo?')">Remover</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>
