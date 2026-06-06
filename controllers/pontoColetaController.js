@@ -39,7 +39,7 @@ module.exports = {
       console.error('Erro ao buscar ponto:', err);
       res.status(500).send('Erro ao carregar edição.');
     }
-  }
+  },
   update: async (req, res) => {
     try {
       const { nomePonto, endereco, residuosAceitos } = req.body;
