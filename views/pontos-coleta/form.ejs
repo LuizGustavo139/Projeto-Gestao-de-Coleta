@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title><%= ponto ? 'Editar' : 'Novo' %> Ponto de Coleta - Coleta Seletiva</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  <div class="container">
+    <h2><%= ponto ? '✏️ Editar Ponto de Coleta' : '➕ Novo Ponto de Coleta' %></h2>
+
+    <% if (erro) { %>
+      <p class="error-msg"><%= erro %></p>
+    <% } %>
+
+    <form action="/pontos-coleta/<%= ponto ? 'editar/' + ponto.id : 'novo' %>" method="POST" class="form-card">
+      <div class="form-group">
+        <label for="nomePonto">Nome do Ponto *</label>
+        <input type="text" id="nomePonto" name="nomePonto"
+               value="<%= ponto ? ponto.nomePonto : '' %>"
+               placeholder="Ex: EcoPonto Centro" required>
+      </div>
+      <div class="form-group">
+        <label for="endereco">Endereço *</label>
+        <input type="text" id="endereco" name="endereco"
+               value="<%= ponto ? ponto.endereco : '' %>"
+               placeholder="Ex: Rua das Flores, 100" required>
+      </div>
+      <div class="form-group">
+        <label for="residuosAceitos">Resíduos Aceitos *</label>
+        <input type="text" id="residuosAceitos" name="residuosAceitos"
+               value="<%= ponto ? ponto.residuosAceitos : '' %>"
+               placeholder="Ex: Plástico, Vidro, Papel" required>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="/pontos-coleta" class="btn btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
