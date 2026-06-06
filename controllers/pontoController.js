@@ -1,4 +1,4 @@
-// Importação dupla de segurança para evitar erros de caminhos no Sequelize
+
 let models;
 try {
   models = require('../models');
@@ -12,7 +12,7 @@ try {
 const { Agendamento, PontoColeta, Residuo } = models;
 
 module.exports = {
-  // Exibir o Dashboard com dados consolidados e relacionados
+  
   getAll: async (req, res) => {
     try {
       const agendamentos = await Agendamento.findAll({ 
@@ -32,7 +32,7 @@ module.exports = {
     }
   },
 
-  // Tela para criar novo agendamento
+  
   renderCreate: async (req, res) => {
     try {
       const pontos = await PontoColeta.findAll();
@@ -44,7 +44,7 @@ module.exports = {
     }
   },
 
-  // Salvar novo agendamento
+  
   create: async (req, res) => {
     try {
       const { pontoColetaId, residuoId, dataHora, endereco } = req.body;
@@ -64,7 +64,7 @@ module.exports = {
     }
   },
 
-  // Tela para editar agendamento
+  
   renderEdit: async (req, res) => {
     try {
       const agendamento = await Agendamento.findOne({ where: { id: req.params.id, UserId: req.user.id } });
@@ -79,7 +79,7 @@ module.exports = {
     }
   },
 
-  // Atualizar agendamento
+  
   update: async (req, res) => {
     try {
       const { pontoColetaId, residuoId, dataHora, endereco, status } = req.body;
@@ -101,7 +101,7 @@ module.exports = {
     }
   },
 
-  // Cancelar/Deletar agendamento
+  
   delete: async (req, res) => {
     try {
       await Agendamento.destroy({ where: { id: req.params.id, UserId: req.user.id } });

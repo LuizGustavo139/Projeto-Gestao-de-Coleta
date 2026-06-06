@@ -1,7 +1,7 @@
-const { Residuo } = require('../../models');
+const { Residuo } = require('../models');
 
 module.exports = {
-  // Listar todos os resíduos
+  
   getAll: async (req, res) => {
     try {
       const residuos = await Residuo.findAll();
@@ -12,12 +12,12 @@ module.exports = {
     }
   },
 
-  // Tela de cadastro
+  
   renderCreate: (req, res) => {
     res.render('residuos/form', { residuo: null, erro: null });
   },
 
-  // Salvar novo resíduo
+  
   create: async (req, res) => {
     try {
       const { nomeResiduo, descricao } = req.body;
@@ -32,7 +32,7 @@ module.exports = {
     }
   },
 
-  // Tela de edição
+  
   renderEdit: async (req, res) => {
     try {
       const residuo = await Residuo.findByPk(req.params.id);
@@ -44,7 +44,7 @@ module.exports = {
     }
   },
 
-  // Atualizar resíduo
+  
   update: async (req, res) => {
     try {
       const { nomeResiduo, descricao } = req.body;
@@ -63,7 +63,7 @@ module.exports = {
     }
   },
 
-  // Remover resíduo
+  
   delete: async (req, res) => {
     try {
       await Residuo.destroy({ where: { id: req.params.id } });
