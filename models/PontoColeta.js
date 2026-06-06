@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../../config/database');
+const sequelize = require('../config/database');
 
 const PontoColeta = sequelize.define('PontoColeta', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
