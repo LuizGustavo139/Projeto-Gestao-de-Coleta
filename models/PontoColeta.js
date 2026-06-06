@@ -5,7 +5,7 @@ const PontoColeta = sequelize.define('PontoColeta', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   nomePonto: { type: DataTypes.STRING, allowNull: false },
   endereco: { type: DataTypes.STRING, allowNull: false },
-  residuosAceitos: { type: DataTypes.STRING, allowNull: false } // Ex: "Plástico, Vidro"
+  residuosAceitos: { type: DataTypes.STRING, allowNull: false } 
 });
 
 module.exports = PontoColeta;
