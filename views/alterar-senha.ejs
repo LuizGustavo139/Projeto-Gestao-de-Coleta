@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Redefinir Senha - Coleta Seletiva</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <% if (typeof user !== 'undefined' && user) { %>
+    <%- include('./partials/navbar') %>
+  <% } %>
+
+  <div class="container" style="max-width: 400px; margin-top: 50px;">
+    <h2>🔐 Redefinir Senha</h2>
+    <p class="text-muted">Digite seu e-mail cadastrado e a nova senha para atualizar seu acesso.</p>
+
+    <% if (error) { %>
+      <div class="alert alert-danger" style="color: red; margin-bottom: 15px;">
+        ⚠️ <%= error %>
+      </div>
+    <% } %>
+
+    <% if (success) { %>
+      <div class="alert alert-success" style="color: green; margin-bottom: 15px;">
+        ✅ <%= success %>
+      </div>
+    <% } %>
+
+    <form action="/auth/alterar-senha" method="POST">
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label for="email">Seu E-mail:</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="seu@email.com" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="novaSenha">Nova Senha:</label>
+        <input type="password" id="novaSenha" name="novaSenha" class="form-control" placeholder="Nova senha de acesso" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Redefinir Senha</button>
+    </form>
+    
+    <div style="margin-top: 20px; text-align: center;">
+      <% if (typeof user !== 'undefined' && user) { %>
+        <% if (user.isAdmin) { %>
+          <a href="/admin/dashboard" class="btn btn-edit" style="text-decoration: none; display: inline-block; padding: 8px 15px; background-color: #6c757d; color: white; border-radius: 4px;">← Voltar para Gestão Admin</a>
+        <% } else { %>
+          <a href="/dashboard" class="btn btn-edit" style="text-decoration: none; display: inline-block; padding: 8px 15px; background-color: #6c757d; color: white; border-radius: 4px;">← Voltar para o Dashboard</a>
+        <% } %>
+      <% } else { %>
+        <a href="/auth/login" class="btn btn-edit" style="text-decoration: none; display: inline-block; padding: 8px 15px; background-color: #6c757d; color: white; border-radius: 4px;">← Voltar para o Login</a>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
