@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const pontoColetaController = require('../controllers/pontoColetaController');
-const authMiddleware = require('../middleware/authMiddleware');
 
-router.use(authMiddleware);
+// ALTERAÇÃO AQUI: Importando a função específica 'estaLogado'
+const { estaLogado } = require('../middleware/authMiddleware');
+
+// ALTERAÇÃO AQUI: Atualizado para usar a função de verificação de login
+router.use(estaLogado);
 
 router.get('/', pontoColetaController.getAll);
 router.get('/novo', pontoColetaController.renderCreate);
