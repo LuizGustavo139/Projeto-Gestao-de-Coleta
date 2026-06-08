@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const residuoController = require('../controllers/residuoController');
-const authMiddleware = require('../middleware/authMiddleware');
 
-router.use(authMiddleware);
+// ALTERAÇÃO AQUI: Importando a função específica 'estaLogado'
+const { estaLogado } = require('../middleware/authMiddleware');
+
+// ALTERAÇÃO AQUI: Atualizado para usar a função correta
+router.use(estaLogado);
 
 router.get('/', residuoController.getAll);
 router.get('/novo', residuoController.renderCreate);
