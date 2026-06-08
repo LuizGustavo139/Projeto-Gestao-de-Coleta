@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Administrador</title>
+    <link rel="stylesheet" href="/css/style.css"> 
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-brand">⚙️ Painel de Administração</div>
+        <div class="navbar-links">
+            <a href="/auth/logout" class="btn btn-danger" style="text-decoration: none; color: white; background-color: #dc3545; padding: 6px 12px; border-radius: 4px; font-weight: bold;">Sair do Modo Admin</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h2>Gestão de Agendamentos</h2>
+        </div>
+
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuário</th>
+                    <th>Ponto de Coleta</th>
+                    <th>Endereço do Usuário</th>
+                    <th>Data Agendada</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (agendamentos && agendamentos.length > 0) { %>
+                    <% agendamentos.forEach(agendamento => { %>
+                        <tr>
+                            <td>#<%= agendamento.id %></td>
+                            <td><%= agendamento.User ? agendamento.User.nome : 'Usuário Deletado' %></td>
+                            <td><%= agendamento.pontoColeta ? agendamento.pontoColeta.nomePonto : 'Não informado' %></td>
+                            <td><%= agendamento.endereco %></td>
+                            <td><%= agendamento.dataHora %></td>
+                            <td>
+                                <span class="status-badge status-<%= agendamento.status.toLowerCase() %>">
+                                    <%= agendamento.status %>
+                                </span>
+                            </td>
+                            <td>
+                                <% if (agendamento.status === 'Pendente') { %>
+                                    <form action="/admin/agendamentos/<%= agendamento.id %>/status" method="POST" style="display: inline;">
+                                        <input type="hidden" name="novoStatus" value="Aprovado">
+                                        <button type="submit" class="btn btn-sm btn-primary" style="background-color: #28a745; border: none; padding: 5px 10px; color: white; cursor: pointer; border-radius: 4px;">Aprovar</button>
+                                    </form>
+
+                                    <form action="/admin/agendamentos/<%= agendamento.id %>/status" method="POST" style="display: inline;">
+                                        <input type="hidden" name="novoStatus" value="Cancelado">
+                                        <button type="submit" class="btn btn-sm btn-danger" style="background-color: #dc3545; border: none; padding: 5px 10px; color: white; cursor: pointer; border-radius: 4px;">Cancelar</button>
+                                    </form>
+                                <% } else { %>
+                                    <span style="color: #6c757d; font-style: italic; font-size: 14px;">🔒 Finalizado (<%= agendamento.status %>)</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="7" class="empty-msg">Nenhum agendamento encontrado no sistema.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
