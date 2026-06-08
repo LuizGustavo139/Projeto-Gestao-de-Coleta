@@ -60,7 +60,9 @@
         <% agendamentos.forEach(agendamento => { %>
           <tr>
             <td><strong><%= agendamento.pontoColeta ? agendamento.pontoColeta.nomePonto : '—' %></strong></td>
-            <td><%= agendamento.residuo ? agendamento.residuo.nomeResiduo : '—' %></td>
+            
+            <td><%= agendamento.nomesResiduos %></td>
+            
             <td><%= agendamento.endereco %></td>
             <td><%= new Date(agendamento.dataHora).toLocaleString('pt-BR') %></td>
             <td>
@@ -69,9 +71,13 @@
               </span>
             </td>
             <td>
-              <a href="/pontos/editar/<%= agendamento.id %>" class="btn btn-sm btn-edit">Editar</a>
-              <a href="/pontos/deletar/<%= agendamento.id %>" class="btn btn-sm btn-danger"
-                 onclick="return confirm('Cancelar este agendamento?')">Cancelar</a>
+              <% if (agendamento.status === 'Pendente') { %>
+                <a href="/pontos/editar/<%= agendamento.id %>" class="btn btn-sm btn-edit">Editar</a>
+                <a href="/pontos/deletar/<%= agendamento.id %>" class="btn btn-sm btn-danger"
+                   onclick="return confirm('Cancelar este agendamento?')">Cancelar</a>
+              <% } else { %>
+                <span style="color: #6c757d; font-style: italic; font-size: 13px; font-weight: bold;">🔒 Finalizado</span>
+              <% } %>
             </td>
           </tr>
         <% }) %>
