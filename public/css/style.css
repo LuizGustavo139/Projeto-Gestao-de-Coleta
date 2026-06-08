@@ -160,6 +160,7 @@ body {
   border: 1px solid #ddd;
   max-width: 520px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  margin: 0 auto;
 }
 .form-group { margin-bottom: 18px; }
 .form-group label {
