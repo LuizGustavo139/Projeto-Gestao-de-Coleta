@@ -8,9 +8,9 @@
 <body>
   <%- include('./partials/navbar') %>
   <div class="container">
-    <h2>📅 Solicitar Novo Agendamento de Coleta</h2>
 
     <form action="/pontos/novo" method="POST" class="form-card">
+        <h2 style="text-align: center; margin-bottom: 24px;">📅 Solicitar Novo Agendamento de Coleta</h2>
       <div class="form-group">
         <label for="pontoColetaId">1. Ponto de Coleta *</label>
         <select id="pontoColetaId" name="pontoColetaId" required>
