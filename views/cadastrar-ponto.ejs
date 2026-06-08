@@ -10,6 +10,12 @@
   <div class="container">
     <h2 style="text-align: center; margin-bottom: 24px;">📅 Solicitar Novo Agendamento de Coleta</h2>
 
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger" style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 12px; border-radius: 4px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+        ⚠️ <%= error %>
+      </div>
+    <% } %>
+
     <form action="/pontos/novo" method="POST" class="form-card">
       <div class="form-group">
         <label for="pontoColetaId">1. Ponto de Coleta *</label>
@@ -22,13 +28,15 @@
       </div>
 
       <div class="form-group">
-        <label for="residuoId">2. Tipo de Resíduo *</label>
-        <select id="residuoId" name="residuoId" required>
-          <option value="" disabled selected>Selecione o resíduo...</option>
+        <label style="font-weight: bold; display: block; margin-bottom: 10px;">2. Tipos de Resíduo (Selecione quantos desejar) *</label>
+        <div class="checkbox-group" style="background: #fdfdfd; padding: 12px; border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto;">
           <% residuos.forEach(res => { %>
-            <option value="<%= res.id %>"><%= res.nomeResiduo %></option>
+            <div style="margin-bottom: 8px; display: flex; align-items: center;">
+              <input type="checkbox" id="res_<%= res.id %>" name="residuoId[]" value="<%= res.id %>" style="width: auto; margin-right: 10px; cursor: pointer;">
+              <label for="res_<%= res.id %>" style="font-weight: normal; margin: 0; cursor: pointer;"><%= res.nomeResiduo %></label>
+            </div>
           <% }) %>
-        </select>
+        </div>
       </div>
 
       <div class="form-group">
@@ -48,5 +56,18 @@
       </div>
     </form>
   </div>
+
+  <script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+      // Busca apenas os checkboxes que estão marcados
+      const checkboxes = document.querySelectorAll('input[name="residuoId[]"]:checked');
+      
+      // Se a quantidade de marcados for zero, barra o envio!
+      if (checkboxes.length === 0) {
+        e.preventDefault(); // Impede o formulário de ser enviado ao servidor
+        alert('⚠️ Opa! Você precisa selecionar pelo menos um tipo de resíduo para realizar o agendamento.');
+      }
+    });
+  </script>
 </body>
 </html>
