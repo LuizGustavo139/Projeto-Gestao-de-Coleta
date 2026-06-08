@@ -4,10 +4,16 @@ const path = require('path');
 require('dotenv').config();
 
 const { sequelize, PontoColeta, Residuo } = require('./models');
+const agendamentoRoutes = require('./routes/agendamentoRoutes');
+const agendamentoController = require('./controllers/agendamentoController');
 const authRoutes = require('./routes/authRoutes');
 const pontoRoutes = require('./routes/pontoRoutes');
 const residuoRoutes = require('./routes/residuoRoutes');
 const pontoColetaRoutes = require('./routes/pontoColetaRoutes');
+
+// IMPORTAÇÃO DOS MIDDLEWARES DE SEGURANÇA
+// (Certifique-se de que a pasta onde está o authMiddleware.js é exatamente esta)
+const { estaLogado, eAdmin } = require('./middleware/authMiddleware');
 
 const app = express();
 
@@ -20,12 +26,23 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Rota raiz
+app.get('/dashboard', (req, res) => res.redirect('/pontos'));
 app.get('/', (req, res) => res.render('index'));
 
 app.use('/auth', authRoutes);
-app.use('/pontos', pontoRoutes);            // Agendamentos
-app.use('/residuos', residuoRoutes);        // CRUD de Resíduos
-app.use('/pontos-coleta', pontoColetaRoutes); // CRUD de Pontos de Coleta
+app.use('/pontos', pontoRoutes);            
+app.use('/residuos', residuoRoutes);        
+app.use('/pontos-coleta', pontoColetaRoutes);
+
+// ROTAS PROTEGIDAS COM MIDDLEWARES
+// O Admin Dashboard exige que esteja Logado E seja Admin
+app.get('/admin/dashboard', estaLogado, eAdmin, agendamentoController.listarAgendamentosAdmin);
+
+// A criação de agendamento exige apenas que o usuário comum esteja Logado
+app.post('/agendamentos/novo', estaLogado, agendamentoController.criarAgendamento);
+
+// A alteração de status exige que esteja Logado E seja Admin
+app.post('/admin/agendamentos/:id/status', estaLogado, eAdmin, agendamentoController.atualizarStatus);
 
 const PORT = process.env.PORT || 3000;
 
