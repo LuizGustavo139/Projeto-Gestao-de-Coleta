@@ -14,52 +14,35 @@ module.exports = {
   
   getAll: async (req, res) => {
     try {
-      // 1. Voltamos para a busca simples e original que seu sistema já aceitava sem erros
       const agendamentosBrutos = await Agendamento.findAll({ 
         where: { UserId: req.user.id }
       });
 
-      // 2. Buscamos as tabelas auxiliares de apoio
       const pontosNoBanco = await PontoColeta.findAll();
       const residuosNoBanco = await Residuo.findAll();
 
       const pontos = pontosNoBanco;
       const residuos = residuosNoBanco;
 
-      // 3. Cruzamento manual e seguro dos IDs via JavaScript
       const agendamentos = agendamentosBrutos.map(agendamento => {
         const dado = agendamento.toJSON();
 
-        // --- ASSOCIAÇÃO DO PONTO DE COLETA ---
+        // Associação Ponto
         const idDoPonto = dado.PontoColetaId || dado.pontoColetaId;
         const pontoEncontrado = pontosNoBanco.find(p => p.id === idDoPonto);
-        
-        // Alimenta a propriedade pontoColeta para o dashboard.ejs ler sem quebrar o layout
         dado.pontoColeta = pontoEncontrado ? pontoEncontrado.toJSON() : { nomePonto: 'Ponto não encontrado', endereco: dado.endereco || 'Não disponível' };
 
-        // --- ASSOCIAÇÃO DOS MÚLTIPLOS RESÍDUOS ---
+        // Associação Resíduo Simplificada (Lendo Apenas Números agora)
         const valorResiduoId = dado.ResiduoId || dado.residuoId;
-        let listaIds = [];
-
         if (!valorResiduoId) {
           dado.nomesResiduos = 'Nenhum selecionado';
           return dado;
         }
 
-        try {
-          // Tenta ler o formato de array em String JSON (ex: '["1","3"]')
-          listaIds = JSON.parse(valorResiduoId);
-        } catch (e) {
-          // Se for um agendamento com id simples clássico (ex: '2'), isola em formato array
-          listaIds = [valorResiduoId.toString()];
-        }
-
-        if (Array.isArray(listaIds)) {
-          const residuosEscolhidos = residuosNoBanco.filter(r => listaIds.includes(r.id.toString()));
-          dado.nomesResiduos = residuosEscolhidos.map(r => r.nomeResiduo).join(', ') || 'Nenhum selecionado';
-        } else {
-          dado.nomesResiduos = 'Nenhum selecionado';
-        }
+        // Transforma pra array apenas para o find, mantendo compatibilidade
+        const listaIds = [valorResiduoId.toString()];
+        const residuosEscolhidos = residuosNoBanco.filter(r => listaIds.includes(r.id.toString()));
+        dado.nomesResiduos = residuosEscolhidos.map(r => r.nomeResiduo).join(', ') || 'Nenhum selecionado';
         
         return dado;
       });
@@ -71,7 +54,6 @@ module.exports = {
     }
   },
 
-  
   renderCreate: async (req, res) => {
     try {
       const pontos = await PontoColeta.findAll();
@@ -83,12 +65,10 @@ module.exports = {
     }
   },
 
-  
   create: async (req, res) => {
     try {
-      const { pontoColetaId, residuoId, dataHora, endereco } = req.body;
+      let { pontoColetaId, residuoId, dataHora, endereco } = req.body;
       
-      // Validação obrigatória contra dados vazios
       if (!residuoId || (Array.isArray(residuoId) && residuoId.length === 0)) {
         const pontos = await PontoColeta.findAll();
         const residuos = await Residuo.findAll();
@@ -99,24 +79,29 @@ module.exports = {
         });
       }
 
-      const residuoIdJson = Array.isArray(residuoId) ? JSON.stringify(residuoId) : JSON.stringify([residuoId]);
+      // 🚨 BLINDAGEM DE EMERGÊNCIA: Se vier array, extrai apenas o primeiro número inteiro
+      let idResiduoLimpo = Array.isArray(residuoId) ? residuoId[0] : residuoId;
+      idResiduoLimpo = parseInt(idResiduoLimpo, 10); // Força ser um número puro para o MySQL
+
+      let idPontoLimpo = Array.isArray(pontoColetaId) ? pontoColetaId[0] : pontoColetaId;
+      idPontoLimpo = parseInt(idPontoLimpo, 10);
 
       await Agendamento.create({
-        dataHora,
-        endereco,
+        dataHora: dataHora || new Date(),
+        endereco: endereco || 'Não informado',
+        status: 'Pendente',
         UserId: req.user.id,
-        PontoColetaId: pontoColetaId,
-        ResiduoId: residuoIdJson
+        PontoColetaId: idPontoLimpo || 1,
+        ResiduoId: idResiduoLimpo || 1 // Envia apenas um NÚMERO
       });
       
       res.redirect('/pontos');
     } catch (err) {
       console.error("Erro detalhado no create do banco:", err);
-      res.status(500).send("Erro ao agendar.");
+      res.status(500).send("Erro interno ao tentar salvar. Veja os logs do Render.");
     }
   },
 
-  
   renderEdit: async (req, res) => {
     try {
       const agendamentoRaw = await Agendamento.findOne({ 
@@ -126,12 +111,7 @@ module.exports = {
       
       const agendamento = agendamentoRaw.toJSON();
       const valorResiduoId = agendamento.ResiduoId || agendamento.residuoId;
-      
-      try {
-        agendamento.residuoIdsSelecionados = JSON.parse(valorResiduoId);
-      } catch (e) {
-        agendamento.residuoIdsSelecionados = valorResiduoId ? [valorResiduoId.toString()] : [];
-      }
+      agendamento.residuoIdsSelecionados = valorResiduoId ? [valorResiduoId.toString()] : [];
 
       const pontos = await PontoColeta.findAll();
       const residuos = await Residuo.findAll();
@@ -142,21 +122,25 @@ module.exports = {
     }
   },
 
-  
   update: async (req, res) => {
     try {
-      const { pontoColetaId, residuoId, dataHora, endereco, status } = req.body;
+      let { pontoColetaId, residuoId, dataHora, endereco, status } = req.body;
       
       if (!residuoId || (Array.isArray(residuoId) && residuoId.length === 0)) {
         return res.status(400).send("É necessário escolher pelo menos um resíduo.");
       }
 
-      const residuoIdJson = Array.isArray(residuoId) ? JSON.stringify(residuoId) : JSON.stringify([residuoId]);
+      // 🚨 BLINDAGEM NO UPDATE TAMBÉM
+      let idResiduoLimpo = Array.isArray(residuoId) ? residuoId[0] : residuoId;
+      idResiduoLimpo = parseInt(idResiduoLimpo, 10);
+      
+      let idPontoLimpo = Array.isArray(pontoColetaId) ? pontoColetaId[0] : pontoColetaId;
+      idPontoLimpo = parseInt(idPontoLimpo, 10);
 
       await Agendamento.update(
         { 
-          PontoColetaId: pontoColetaId, 
-          ResiduoId: residuoIdJson, 
+          PontoColetaId: idPontoLimpo, 
+          ResiduoId: idResiduoLimpo, 
           dataHora, 
           endereco, 
           status 
@@ -170,7 +154,6 @@ module.exports = {
     }
   },
 
-  
   delete: async (req, res) => {
     try {
       await Agendamento.destroy({ 
