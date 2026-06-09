@@ -26,7 +26,7 @@
             </li>
           <% }) %>
         </ul>
-        </div>
+      </div>
 
       <div class="card">
         <h3>♻️ Tipos de Resíduos</h3>
@@ -37,7 +37,7 @@
             </li>
           <% }) %>
         </ul>
-        </div>
+      </div>
     </div>
 
     <hr>
@@ -59,6 +59,10 @@
       <tbody>
         <% agendamentos.forEach(agendamento => { %>
           <tr>
+            <td style="font-size: 13px; color: #555; font-weight: 500;">
+              <%= agendamento.solicitadoEmFormatado %>
+            </td>
+
             <td><strong><%= agendamento.nomeUsuario %></strong></td>
             
             <td><strong><%= agendamento.pontoColeta ? agendamento.pontoColeta.nomePonto : '—' %></strong></td>
@@ -66,12 +70,15 @@
             <td><%= agendamento.nomesResiduos %></td>
             
             <td><%= agendamento.endereco %></td>
+
             <td><%= new Date(agendamento.dataHora).toLocaleString('pt-BR') %></td>
+
             <td>
               <span class="status-badge status-<%= agendamento.status.toLowerCase().replace(' ', '-') %>">
                 <%= agendamento.status %>
               </span>
             </td>
+
             <td>
               <% if (agendamento.status === 'Pendente') { %>
                 <a href="/pontos/editar/<%= agendamento.id %>" class="btn btn-sm btn-edit">Editar</a>
@@ -85,7 +92,7 @@
         <% }) %>
         <% if (agendamentos.length === 0) { %>
           <tr>
-            <td colspan="7" class="empty-msg">Você não possui nenhuma coleta agendada no momento.</td>
+            <td colspan="8" class="empty-msg">Você não possui nenhuma coleta agendada no momento.</td>
           </tr>
         <% } %>
       </tbody>

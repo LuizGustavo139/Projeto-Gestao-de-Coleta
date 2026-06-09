@@ -42,8 +42,8 @@
         <table class="tabela">
             <thead>
                 <tr>
-                    <th>Solicitado em</th>
                     <th>ID</th>
+                    <th>Solicitado em</th>
                     <th>Usuário</th>
                     <th>Ponto de Coleta</th>
                     <th>Tipos de Resíduos</th>
@@ -58,19 +58,29 @@
                     <% agendamentos.forEach(agendamento => { %>
                         <tr>
                             <td><strong>#<%= agendamento.id || 'N/A' %></strong></td>
+                            
+                            <td style="font-size: 13px; color: #555; font-weight: 500;">
+                                <%= agendamento.solicitadoEmFormatado %>
+                            </td>
+
                             <td><%= agendamento.nomeUsuario || (agendamento.User ? agendamento.User.nome : 'Usuário Deletado') %></td>
+                            
                             <td><%= agendamento.pontoColeta ? agendamento.pontoColeta.nomePonto : 'Não informado' %></td>
+                            
                             <td><%= agendamento.nomesResiduos || 'Não informado' %></td>
+                            
                             <td><%= agendamento.endereco %></td>
+                            
                             <td><%= new Date(agendamento.dataHora).toLocaleString('pt-BR') %></td>
+                            
                             <td>
                                 <span class="status-badge status-<%= agendamento.status.toLowerCase().replace(' ', '-') %>">
                                     <%= agendamento.status %>
                                 </span>
                             </td>
+                            
                             <td>
                                 <form action="/admin/agendamentos/<%= agendamento.id %>/status" method="POST" style="display: flex; align-items: center; gap: 5px;">
-                                    
                                     <select name="novoStatus" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
                                         <option value="Pendente" <%= agendamento.status === 'Pendente' ? 'selected' : '' %>>Pendente</option>
                                         <option value="Aprovado" <%= agendamento.status === 'Aprovado' ? 'selected' : '' %>>Aprovado</option>
@@ -78,7 +88,6 @@
                                         <option value="Concluído" <%= agendamento.status === 'Concluído' ? 'selected' : '' %>>Concluído</option>
                                         <option value="Cancelado" <%= agendamento.status === 'Cancelado' ? 'selected' : '' %>>Cancelado</option>
                                     </select>
-                                    
                                     <button type="submit" class="btn btn-sm btn-primary" style="padding: 5px 10px; font-size: 13px; border-radius: 4px; border: none; background-color: #007bff; color: white; cursor: pointer;">
                                         Atualizar
                                     </button>
@@ -88,7 +97,7 @@
                     <% }) %>
                 <% } else { %>
                     <tr>
-                        <td colspan="8" class="empty-msg">Nenhum agendamento encontrado no sistema.</td>
+                        <td colspan="9" class="empty-msg">Nenhum agendamento encontrado no sistema.</td>
                     </tr>
                 <% } %>
             </tbody>
