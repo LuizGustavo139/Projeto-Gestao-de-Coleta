@@ -22,18 +22,38 @@
                value="<%= ponto ? ponto.nomePonto : '' %>"
                placeholder="Ex: EcoPonto Centro" required>
       </div>
+      
       <div class="form-group">
         <label for="endereco">Endereço *</label>
         <input type="text" id="endereco" name="endereco"
                value="<%= ponto ? ponto.endereco : '' %>"
                placeholder="Ex: Rua das Flores, 100" required>
       </div>
-      <div class="form-group">
-        <label for="residuosAceitos">Resíduos Aceitos *</label>
-        <input type="text" id="residuosAceitos" name="residuosAceitos"
-               value="<%= ponto ? ponto.residuosAceitos : '' %>"
-               placeholder="Ex: Plástico, Vidro, Papel" required>
+      
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label style="display: block; font-weight: bold; margin-bottom: 8px;">Resíduos Aceitos *</label>
+        
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px; border: 1px solid #ccc; border-radius: 4px; background: #fafafa; max-height: 200px; overflow-y: auto;">
+          <% if (typeof residuos !== 'undefined' && residuos.length > 0) { %>
+            <% residuos.forEach(res => { %>
+              <% 
+                // Se for edição, verifica se este resíduo específico já estava salvo na string do ponto
+                let jaAceita = false;
+                if (ponto && ponto.residuosAceitos) {
+                  jaAceita = ponto.residuosAceitos.split(', ').map(item => item.trim()).includes(res.nomeResiduo);
+                }
+              %>
+              <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; margin: 0; font-size: 14px; color: #333;">
+                <input type="checkbox" name="residuosAceitos" value="<%= res.nomeResiduo %>" <%= jaAceita ? 'checked' : '' %> style="cursor: pointer; width: auto; margin: 0;">
+                <%= res.nomeResiduo %>
+              </label>
+            <% }) %>
+          <% } else { %>
+            <p style="grid-column: span 2; color: #dc3545; font-size: 13px; margin: 0;">Nenhum tipo de resíduo cadastrado no sistema.</p>
+          <% } %>
+        </div>
       </div>
+
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">Salvar</button>
         <a href="/pontos-coleta" class="btn btn-secondary">Cancelar</a>
