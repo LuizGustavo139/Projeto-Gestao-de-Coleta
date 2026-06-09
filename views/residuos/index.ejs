@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resíduos - Coleta Seletiva</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -17,30 +18,34 @@
     <% if (residuos.length === 0) { %>
       <p class="empty-msg" style="text-align: center;">Nenhum resíduo cadastrado ainda.</p>
     <% } else { %>
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nome</th>
-            <th>Descrição</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% residuos.forEach(res => { %>
+      <div class="tabela-container">
+        <table class="tabela">
+          <thead>
             <tr>
-              <td><%= res.id %></td>
-              <td><strong><%= res.nomeResiduo %></strong></td>
-              <td><%= res.descricao || '—' %></td>
-              <td>
-                <a href="/residuos/editar/<%= res.id %>" class="btn btn-sm btn-edit">Editar</a>
-                <a href="/residuos/deletar/<%= res.id %>" class="btn btn-sm btn-danger"
-                   onclick="return confirm('Remover este resíduo?')">Remover</a>
-              </td>
+              <th>#</th>
+              <th>Nome</th>
+              <th style="white-space: normal; min-width: 220px;">Descrição</th>
+              <th>Ações</th>
             </tr>
-          <% }) %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% residuos.forEach(res => { %>
+              <tr>
+                <td><%= res.id %></td>
+                <td><strong><%= res.nomeResiduo %></strong></td>
+                <td style="white-space: normal; color: #555;"><%= res.descricao || '—' %></td>
+                <td>
+                  <div style="display: flex; gap: 5px;">
+                    <a href="/residuos/editar/<%= res.id %>" class="btn btn-sm btn-edit">Editar</a>
+                    <a href="/residuos/deletar/<%= res.id %>" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Remover este resíduo?')">Remover</a>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     <% } %>
   </div>
 </body>
