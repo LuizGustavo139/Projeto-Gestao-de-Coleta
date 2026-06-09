@@ -10,7 +10,7 @@
     <div class="auth-card">
       <div class="auth-logo">🌱</div>
       <h2>Criar Conta</h2>
-      <% if(error) { %> <p class="error-msg"><%= error %></p> <% } %>
+      <% if(typeof error !== 'undefined' && error) { %> <p class="error-msg"><%= error %></p> <% } %>
       <form action="/auth/register" method="POST" class="form-card">
         <div class="form-group">
           <label for="nome">Nome Completo</label>
@@ -22,7 +22,7 @@
         </div>
         <div class="form-group">
           <label for="senha">Senha</label>
-          <input type="password" id="senha" name="senha" placeholder="Mínimo 6 caracteres" required>
+          <input type="password" id="senha" name="senha" placeholder="Mínimo 5 caracteres" minlength="5" required>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Registrar</button>
       </form>

@@ -15,6 +15,11 @@ module.exports = {
     try {
       const { nome, email, senha } = req.body;
 
+      // 🚨 TRAVA DE SEGURANÇA BACK-END: Impede senhas com menos de 5 dígitos no cadastro
+      if (!senha || senha.trim().length < 5) {
+        return res.render('register', { error: 'A senha precisa conter no mínimo 5 caracteres.' });
+      }
+
       const userExists = await User.findOne({ where: { email } });
       if (userExists) {
         return res.render('register', { error: 'Este e-mail já está cadastrado.' });
@@ -91,6 +96,11 @@ module.exports = {
   alterarSenha: async (req, res) => {
     try {
       const { email, novaSenha } = req.body;
+
+      // 🚨 TRAVA DE SEGURANÇA BACK-END: Impede senhas com menos de 5 dígitos na redefinição
+      if (!novaSenha || novaSenha.trim().length < 5) {
+        return res.render('alterar-senha', { error: 'A nova senha precisa conter no mínimo 5 caracteres.', success: null });
+      }
       
       const user = await User.findOne({ where: { email } });
 
