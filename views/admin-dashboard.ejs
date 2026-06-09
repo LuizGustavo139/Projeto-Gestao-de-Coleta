@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Administrador</title>
     <link rel="stylesheet" href="/css/style.css"> 
 </head>
@@ -39,69 +40,71 @@
             <h2>📋 Gestão de Agendamentos</h2>
         </div>
 
-        <table class="tabela">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Solicitado em</th>
-                    <th>Usuário</th>
-                    <th>Ponto de Coleta</th>
-                    <th>Tipos de Resíduos</th>
-                    <th>Endereço do Usuário</th>
-                    <th>Data Agendada</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% if (agendamentos && agendamentos.length > 0) { %>
-                    <% agendamentos.forEach(agendamento => { %>
-                        <tr>
-                            <td><strong>#<%= agendamento.id || 'N/A' %></strong></td>
-                            
-                            <td style="font-size: 13px; color: #555; font-weight: 500;">
-                                <%= agendamento.solicitadoEmFormatado %>
-                            </td>
-
-                            <td><%= agendamento.nomeUsuario || (agendamento.User ? agendamento.User.nome : 'Usuário Deletado') %></td>
-                            
-                            <td><%= agendamento.pontoColeta ? agendamento.pontoColeta.nomePonto : 'Não informado' %></td>
-                            
-                            <td><%= agendamento.nomesResiduos || 'Não informado' %></td>
-                            
-                            <td><%= agendamento.endereco %></td>
-                            
-                            <td><%= new Date(agendamento.dataHora).toLocaleString('pt-BR') %></td>
-                            
-                            <td>
-                                <span class="status-badge status-<%= agendamento.status.toLowerCase().replace(' ', '-') %>">
-                                    <%= agendamento.status %>
-                                </span>
-                            </td>
-                            
-                            <td>
-                                <form action="/admin/agendamentos/<%= agendamento.id %>/status" method="POST" style="display: flex; align-items: center; gap: 5px;">
-                                    <select name="novoStatus" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
-                                        <option value="Pendente" <%= agendamento.status === 'Pendente' ? 'selected' : '' %>>Pendente</option>
-                                        <option value="Aprovado" <%= agendamento.status === 'Aprovado' ? 'selected' : '' %>>Aprovado</option>
-                                        <option value="Em Andamento" <%= agendamento.status === 'Em Andamento' ? 'selected' : '' %>>Em Andamento</option>
-                                        <option value="Concluído" <%= agendamento.status === 'Concluído' ? 'selected' : '' %>>Concluído</option>
-                                        <option value="Cancelado" <%= agendamento.status === 'Cancelado' ? 'selected' : '' %>>Cancelado</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-sm btn-primary" style="padding: 5px 10px; font-size: 13px; border-radius: 4px; border: none; background-color: #007bff; color: white; cursor: pointer;">
-                                        Atualizar
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    <% }) %>
-                <% } else { %>
+        <div class="tabela-container">
+            <table class="tabela">
+                <thead>
                     <tr>
-                        <td colspan="9" class="empty-msg">Nenhum agendamento encontrado no sistema.</td>
+                        <th>ID</th>
+                        <th>Solicitado em</th>
+                        <th>Usuário</th>
+                        <th>Ponto de Coleta</th>
+                        <th style="white-space: normal; min-width: 140px;">Tipos de Resíduos</th>
+                        <th style="white-space: normal; min-width: 180px;">Endereço do Usuário</th>
+                        <th>Data Agendada</th>
+                        <th>Status</th>
+                        <th>Ações</th>
                     </tr>
-                <% } %>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <% if (agendamentos && agendamentos.length > 0) { %>
+                        <% agendamentos.forEach(agendamento => { %>
+                            <tr>
+                                <td><strong>#<%= agendamento.id || 'N/A' %></strong></td>
+                                
+                                <td style="font-size: 13px; color: #555; font-weight: 500;">
+                                    <%= agendamento.solicitadoEmFormatado %>
+                                </td>
+
+                                <td><%= agendamento.nomeUsuario || (agendamento.User ? agendamento.User.nome : 'Usuário Deletado') %></td>
+                                
+                                <td><%= agendamento.pontoColeta ? agendamento.pontoColeta.nomePonto : 'Não informado' %></td>
+                                
+                                <td style="white-space: normal;"><%= agendamento.nomesResiduos || 'Não informado' %></td>
+                                
+                                <td style="white-space: normal;"><%= agendamento.endereco %></td>
+                                
+                                <td><%= new Date(agendamento.dataHora).toLocaleString('pt-BR') %></td>
+                                
+                                <td>
+                                    <span class="status-badge status-<%= agendamento.status.toLowerCase().replace(' ', '-') %>">
+                                        <%= agendamento.status %>
+                                    </span>
+                                </td>
+                                
+                                <td>
+                                    <form action="/admin/agendamentos/<%= agendamento.id %>/status" method="POST" style="display: flex; align-items: center; gap: 5px;">
+                                        <select name="novoStatus" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; width: auto;">
+                                            <option value="Pendente" <%= agendamento.status === 'Pendente' ? 'selected' : '' %>>Pendente</option>
+                                            <option value="Aprovado" <%= agendamento.status === 'Aprovado' ? 'selected' : '' %>>Aprovado</option>
+                                            <option value="Em Andamento" <%= agendamento.status === 'Em Andamento' ? 'selected' : '' %>>Em Andamento</option>
+                                            <option value="Concluído" <%= agendamento.status === 'Concluído' ? 'selected' : '' %>>Concluído</option>
+                                            <option value="Cancelado" <%= agendamento.status === 'Cancelado' ? 'selected' : '' %>>Cancelado</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-primary" style="padding: 5px 10px; font-size: 13px; border-radius: 4px; border: none; background-color: #007bff; color: white; cursor: pointer; width: auto;">
+                                            Atualizar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="9" class="empty-msg">Nenhum agendamento encontrado no sistema.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>
