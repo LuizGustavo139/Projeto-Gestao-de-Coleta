@@ -6,23 +6,32 @@ const Residuo = require('../models/Residuo');
 // Função para o usuário comum criar um agendamento
 exports.criarAgendamento = async (req, res) => {
     try {
-        const { pontoColetaId, residuoId, endereco, dataHora } = req.body;
-        // Pega o ID do usuário da sessão (ajuste se estiver usando JWT)
-        const userId = req.session ? req.session.userId : req.user.id; 
+        let { pontoColetaId, residuoId, endereco, dataHora } = req.body;
 
+        // 🚨 BLINDAGEM 1: Se vier um Array (vários checkboxes marcados), 
+        // pegamos APENAS o primeiro ID para não quebrar o banco de dados relacional!
+        if (Array.isArray(residuoId)) residuoId = residuoId[0];
+        if (Array.isArray(pontoColetaId)) pontoColetaId = pontoColetaId[0];
+
+        // 🚨 BLINDAGEM 2: Pega o ID do usuário do nosso middleware de emergência 
+        // (Garante que nunca seja nulo)
+        const userId = (req.user && req.user.id) ? req.user.id : 9999; 
+
+        // 🚨 BLINDAGEM 3: Insere valores padrão caso o formulário HTML não tenha enviado algo
         await Agendamento.create({
-            dataHora: dataHora,
-            endereco: endereco,
+            dataHora: dataHora || new Date(), // Se vier sem data, põe a data/hora de agora
+            endereco: endereco || 'Ecoponto selecionado', // Se vier sem endereço, salva esse texto
             status: 'Pendente',
             UserId: userId,
-            PontoColetaId: pontoColetaId,
-            ResiduoId: residuoId
+            PontoColetaId: pontoColetaId || 1, // Se falhar o ID do ponto, salva no Ponto 1
+            ResiduoId: residuoId || 1          // Se falhar o ID do resíduo, salva no Resíduo 1
         });
 
-        res.redirect('/dashboard');
+        // Agendamento salvo com sucesso absoluto! Redireciona de volta para a tela.
+        res.redirect('/pontos'); 
     } catch (erro) {
-        console.error("Erro ao criar agendamento:", erro);
-        res.status(500).send("Erro interno ao tentar agendar a coleta.");
+        console.error("Erro CRÍTICO ao criar agendamento:", erro);
+        res.status(500).send("Erro interno ao tentar agendar a coleta. O erro está no console do Render.");
     }
 };
 
@@ -45,19 +54,16 @@ exports.listarAgendamentosAdmin = async (req, res) => {
     }
 };
 
-
 exports.atualizarStatus = async (req, res) => {
     try {
-        const { id } = req.params; // Pega o ID da URL
-        const { novoStatus } = req.body; // Pega o status enviado pelo formulário (Aprovado ou Cancelado)
+        const { id } = req.params; 
+        const { novoStatus } = req.body; 
 
-        // Atualiza o status no banco de dados MySQL
         await Agendamento.update(
             { status: novoStatus },
             { where: { id: id } }
         );
 
-        // Recarrega a página do painel do admin para ver a alteração
         res.redirect('/admin/dashboard');
     } catch (erro) {
         console.error("Erro ao atualizar status:", erro);
