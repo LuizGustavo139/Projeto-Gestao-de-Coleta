@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro - Coleta Seletiva</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -10,7 +11,11 @@
     <div class="auth-card">
       <div class="auth-logo">🌱</div>
       <h2>Criar Conta</h2>
-      <% if(typeof error !== 'undefined' && error) { %> <p class="error-msg"><%= error %></p> <% } %>
+      
+      <% if(typeof error !== 'undefined' && error) { %> 
+        <p class="error-msg"><%= error %></p> 
+      <% } %>
+
       <form action="/auth/register" method="POST" class="form-card">
         <div class="form-group">
           <label for="nome">Nome Completo</label>
@@ -26,6 +31,7 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">Registrar</button>
       </form>
+      
       <p class="auth-link">Já tem conta? <a href="/auth/login">Faça Login</a></p>
       <p class="auth-link"><a href="/">← Voltar ao início</a></p>
     </div>

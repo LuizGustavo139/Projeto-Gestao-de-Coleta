@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Coleta Seletiva</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -10,7 +11,11 @@
     <div class="auth-card">
       <div class="auth-logo">🌱</div>
       <h2>Entrar no Sistema</h2>
-      <% if(error) { %> <p class="error-msg"><%= error %></p> <% } %>
+      
+      <% if(typeof error !== 'undefined' && error) { %> 
+        <p class="error-msg"><%= error %></p> 
+      <% } %>
+
       <form action="/auth/login" method="POST" class="form-card">
         <div class="form-group">
           <label for="email">E-mail</label>
@@ -19,14 +24,13 @@
         <div class="form-group">
           <label for="senha">Senha</label>
           <input type="password" id="senha" name="senha" placeholder="Sua senha" required>
+          <div style="text-align: right; margin-top: 5px;">
+            <a href="/auth/alterar-senha" style="font-size: 0.8rem; color: #666; text-decoration: none;">Esqueceu sua senha?</a>
+          </div>
         </div>
-        
-        <div style="text-align: right; margin-top: -10px; margin-bottom: 20px;">
-          <a href="/auth/alterar-senha" style="font-size: 13px; color: #6c757d; text-decoration: none;">Esqueceu sua senha?</a>
-        </div>
-
         <button type="submit" class="btn btn-primary btn-block">Entrar</button>
       </form>
+      
       <p class="auth-link">Não tem conta? <a href="/auth/register">Cadastre-se</a></p>
       <p class="auth-link"><a href="/">← Voltar ao início</a></p>
     </div>
