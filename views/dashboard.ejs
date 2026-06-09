@@ -48,7 +48,7 @@
     <table class="tabela">
       <thead>
         <tr>
-          <th>Ponto de Coleta</th>
+          <th>Nome / Solicitante</th> <th>Ponto de Coleta</th>
           <th>Tipo de Resíduo</th>
           <th>Endereço de Descarte</th>
           <th>Data / Hora</th>
@@ -59,6 +59,8 @@
       <tbody>
         <% agendamentos.forEach(agendamento => { %>
           <tr>
+            <td><strong><%= agendamento.nomeUsuario %></strong></td>
+            
             <td><strong><%= agendamento.pontoColeta ? agendamento.pontoColeta.nomePonto : '—' %></strong></td>
             
             <td><%= agendamento.nomesResiduos %></td>
@@ -83,7 +85,7 @@
         <% }) %>
         <% if (agendamentos.length === 0) { %>
           <tr>
-            <td colspan="6" class="empty-msg">Você não possui nenhuma coleta agendada no momento.</td>
+            <td colspan="7" class="empty-msg">Você não possui nenhuma coleta agendada no momento.</td>
           </tr>
         <% } %>
       </tbody>

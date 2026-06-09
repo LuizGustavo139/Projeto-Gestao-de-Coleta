@@ -22,7 +22,7 @@ module.exports = {
       const pontosNoBanco = await PontoColeta.findAll();
       const residuosNoBanco = await Residuo.findAll();
 
-      // 🚨 MÁGICA DO AGRUPAMENTO: Junta os agendamentos do mesmo dia/ponto em 1 linha só!
+      // MÁGICA DO AGRUPAMENTO: Junta os agendamentos do mesmo dia/ponto em 1 linha só!
       const mapAgrupado = {};
       for (let ag of agendamentosBrutos) {
         const dado = ag.toJSON();
@@ -44,11 +44,15 @@ module.exports = {
         const residuosEscolhidos = residuosNoBanco.filter(r => dado.listaResiduoIds.includes(r.id));
         dado.nomesResiduos = residuosEscolhidos.map(r => r.nomeResiduo).join(', ') || 'Nenhum';
         
+        // 🚨 AQUI ESTÁ A ADIÇÃO: Pegando o nome do usuário logado e enviando para a tela
+        dado.nomeUsuario = req.user.nome || 'Usuário';
+        
         return dado;
       });
 
       res.render('dashboard', { agendamentos, pontos: pontosNoBanco, residuos: residuosNoBanco });
     } catch (err) {
+      console.error(err);
       res.status(500).send("Erro interno ao carregar o Dashboard.");
     }
   },
@@ -97,7 +101,6 @@ module.exports = {
       const agendamentoRaw = await Agendamento.findOne({ where: { id: req.params.id, UserId: req.user.id } });
       if (!agendamentoRaw) return res.redirect('/pontos');
       
-      // Busca todo o grupo para carregar os checkboxes corretos na tela de edição
       const doMesmoGrupo = await Agendamento.findAll({ 
         where: { dataHora: agendamentoRaw.dataHora, PontoColetaId: agendamentoRaw.PontoColetaId, UserId: req.user.id } 
       });
@@ -124,7 +127,6 @@ module.exports = {
       const agendamentoRaw = await Agendamento.findOne({ where: { id: req.params.id, UserId: req.user.id } });
       if (!agendamentoRaw) return res.redirect('/pontos');
 
-      // Remove o grupo antigo inteiro e recria atualizado
       await Agendamento.destroy({ 
         where: { dataHora: agendamentoRaw.dataHora, PontoColetaId: agendamentoRaw.PontoColetaId, UserId: req.user.id } 
       });
@@ -147,7 +149,6 @@ module.exports = {
     try {
       const agendamentoRaw = await Agendamento.findOne({ where: { id: req.params.id, UserId: req.user.id } });
       if (agendamentoRaw) {
-        // Exclui o grupo inteiro de uma vez
         await Agendamento.destroy({ 
           where: { dataHora: agendamentoRaw.dataHora, PontoColetaId: agendamentoRaw.PontoColetaId, UserId: req.user.id } 
         });
