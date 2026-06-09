@@ -3,7 +3,7 @@ const router = express.Router();
 const agendamentoController = require('../controllers/agendamentoController.js');
 
 // Importa os middlewares de segurança
-const { estaLogado, eAdmin } = require('../middlewares/authMiddleware.js');
+const { estaLogado, eAdmin } = require('../middleware/authMiddleware.js');
 
 // Rota para criar um agendamento (POST)
 router.post('/agendamentos/novo', estaLogado, agendamentoController.criarAgendamento);
