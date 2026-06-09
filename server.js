@@ -3,7 +3,8 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 require('dotenv').config();
 
-const { sequelize, PontoColeta, Residuo } = require('./models');
+// ALTERADO: Adicionado 'User' na desestruturação dos modelos
+const { sequelize, PontoColeta, Residuo, User } = require('./models');
 const agendamentoRoutes = require('./routes/agendamentoRoutes');
 const agendamentoController = require('./controllers/agendamentoController');
 const authRoutes = require('./routes/authRoutes');
@@ -12,7 +13,6 @@ const residuoRoutes = require('./routes/residuoRoutes');
 const pontoColetaRoutes = require('./routes/pontoColetaRoutes');
 
 // IMPORTAÇÃO DOS MIDDLEWARES DE SEGURANÇA
-// (Certifique-se de que a pasta onde está o authMiddleware.js é exatamente esta)
 const { estaLogado, eAdmin } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -35,18 +35,36 @@ app.use('/residuos', residuoRoutes);
 app.use('/pontos-coleta', pontoColetaRoutes);
 
 // ROTAS PROTEGIDAS COM MIDDLEWARES
-// O Admin Dashboard exige que esteja Logado E seja Admin
 app.get('/admin/dashboard', estaLogado, eAdmin, agendamentoController.listarAgendamentosAdmin);
-
-// A criação de agendamento exige apenas que o usuário comum esteja Logado
 app.post('/agendamentos/novo', estaLogado, agendamentoController.criarAgendamento);
-
-// A alteração de status exige que esteja Logado E seja Admin
 app.post('/admin/agendamentos/:id/status', estaLogado, eAdmin, agendamentoController.atualizarStatus);
 
 const PORT = process.env.PORT || 3000;
 
 sequelize.sync({ force: false }).then(async () => {
+  
+  // =========================================================================
+  // LOGICA DE CRIAÇÃO DO ADMINISTRADOR PADRÃO (SEED)
+  // =========================================================================
+  try {
+    // 1. Procura na nuvem se já existe o e-mail do admin cadastrado
+    const adminExistente = await User.findOne({ where: { email: 'admin@coleta.com' } });
+    
+    // 2. Se não existir, insere o usuário Admin automaticamente
+    if (!adminExistente) {
+      await User.create({
+        nome: "Administrador Geral",
+        email: "admin@coleta.com",
+        senha: "admin", // 🚨 ATENÇÃO: Se o seu login usar criptografia como bcrypt, lembre-se de passar o hash criptografado aqui!
+        tipo: "admin"   // Ajuste para 'role' se sua coluna no banco possuir esse nome
+      });
+      console.log('ℹ️ Usuário administrador padrão criado com sucesso no banco da nuvem!');
+    }
+  } catch (error) {
+    console.error('⚠️ Erro ao executar o seed do administrador:', error);
+  }
+  // =========================================================================
+
   const contagemPontos = await PontoColeta.count();
   if (contagemPontos === 0) {
     await PontoColeta.bulkCreate([
