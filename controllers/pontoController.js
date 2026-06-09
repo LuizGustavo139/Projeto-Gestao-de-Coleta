@@ -15,7 +15,8 @@ module.exports = {
   getAll: async (req, res) => {
     try {
       const agendamentosBrutos = await Agendamento.findAll({ 
-        where: { UserId: req.user.id }
+        where: { UserId: req.user.id },
+        order: [['createdAt', 'DESC']] // Mostra os mais recentes primeiro
       });
 
       const pontosNoBanco = await PontoColeta.findAll();
@@ -27,19 +28,16 @@ module.exports = {
       const agendamentos = agendamentosBrutos.map(agendamento => {
         const dado = agendamento.toJSON();
 
-        // Associação Ponto
         const idDoPonto = dado.PontoColetaId || dado.pontoColetaId;
         const pontoEncontrado = pontosNoBanco.find(p => p.id === idDoPonto);
         dado.pontoColeta = pontoEncontrado ? pontoEncontrado.toJSON() : { nomePonto: 'Ponto não encontrado', endereco: dado.endereco || 'Não disponível' };
 
-        // Associação Resíduo Simplificada (Lendo Apenas Números agora)
         const valorResiduoId = dado.ResiduoId || dado.residuoId;
         if (!valorResiduoId) {
           dado.nomesResiduos = 'Nenhum selecionado';
           return dado;
         }
 
-        // Transforma pra array apenas para o find, mantendo compatibilidade
         const listaIds = [valorResiduoId.toString()];
         const residuosEscolhidos = residuosNoBanco.filter(r => listaIds.includes(r.id.toString()));
         dado.nomesResiduos = residuosEscolhidos.map(r => r.nomeResiduo).join(', ') || 'Nenhum selecionado';
@@ -50,7 +48,7 @@ module.exports = {
       res.render('dashboard', { agendamentos, pontos, residuos });
     } catch (err) {
       console.error("ERRO COMPLETO NO GETALL:", err);
-      res.status(500).send("Erro interno ao carregar o Dashboard. Verifique o terminal.");
+      res.status(500).send("Erro interno ao carregar o Dashboard.");
     }
   },
 
@@ -79,21 +77,23 @@ module.exports = {
         });
       }
 
-      // 🚨 BLINDAGEM DE EMERGÊNCIA: Se vier array, extrai apenas o primeiro número inteiro
-      let idResiduoLimpo = Array.isArray(residuoId) ? residuoId[0] : residuoId;
-      idResiduoLimpo = parseInt(idResiduoLimpo, 10); // Força ser um número puro para o MySQL
+      // 🚨 A MÁGICA ACONTECE AQUI: Transforma em array sempre para contarmos quantos checkboxes foram marcados
+      const listaResiduos = Array.isArray(residuoId) ? residuoId : [residuoId];
 
       let idPontoLimpo = Array.isArray(pontoColetaId) ? pontoColetaId[0] : pontoColetaId;
       idPontoLimpo = parseInt(idPontoLimpo, 10);
 
-      await Agendamento.create({
-        dataHora: dataHora || new Date(),
-        endereco: endereco || 'Não informado',
-        status: 'Pendente',
-        UserId: req.user.id,
-        PontoColetaId: idPontoLimpo || 1,
-        ResiduoId: idResiduoLimpo || 1 // Envia apenas um NÚMERO
-      });
+      // 🚨 Laço de Repetição: Cria um agendamento no banco para CADA resíduo marcado!
+      for (let id of listaResiduos) {
+        await Agendamento.create({
+          dataHora: dataHora || new Date(),
+          endereco: endereco || 'Não informado',
+          status: 'Pendente',
+          UserId: req.user.id,
+          PontoColetaId: idPontoLimpo || 1,
+          ResiduoId: parseInt(id, 10) || 1
+        });
+      }
       
       res.redirect('/pontos');
     } catch (err) {
@@ -130,7 +130,7 @@ module.exports = {
         return res.status(400).send("É necessário escolher pelo menos um resíduo.");
       }
 
-      // 🚨 BLINDAGEM NO UPDATE TAMBÉM
+      // Como o update edita uma linha específica por vez, pegamos só o que ele selecionar
       let idResiduoLimpo = Array.isArray(residuoId) ? residuoId[0] : residuoId;
       idResiduoLimpo = parseInt(idResiduoLimpo, 10);
       
