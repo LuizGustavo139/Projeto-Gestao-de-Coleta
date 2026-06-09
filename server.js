@@ -1,7 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-const bcrypt = require('bcrypt'); // 🚀 IMPORTANTE: Importando o bcrypt para criptografar a senha do seed
 require('dotenv').config();
 
 // ALTERADO: Adicionado 'User' na desestruturação dos modelos
@@ -16,7 +15,7 @@ const pontoColetaRoutes = require('./routes/pontoColetaRoutes');
 // IMPORTAÇÃO DOS MIDDLEWARES DE SEGURANÇA
 const { estaLogado, eAdmin } = require('./middleware/authMiddleware');
 
-const app = report || express();
+const app = express(); // 🚀 CORRIGIDO: Removido o 'report ||' que quebrava o script
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,27 +41,23 @@ app.post('/admin/agendamentos/:id/status', estaLogado, eAdmin, agendamentoContro
 
 const PORT = process.env.PORT || 3000;
 
-// 🚨 PASSO 1: Alterado temporariamente para force: true para limpar o admin incorreto e recriar com a criptografia
-sequelize.sync({ force: true }).then(async () => {
+// 🚀 Retornado para force: false para estabilizar seu banco de dados
+sequelize.sync({ force: false }).then(async () => {
   
   // =========================================================================
-  // LOGICA DE CRIAÇÃO DO ADMINISTRADOR PADRÃO (SEED COM BCRYPT)
+  // LOGICA DE CRIAÇÃO DO ADMINISTRADOR PADRÃO EM TEXTO PURO (SEM REQUERER BCRYPT)
   // =========================================================================
   try {
-    // 1. Procura na nuvem se já existe o e-mail do admin cadastrado
     const adminExistente = await User.findOne({ where: { email: 'admin@coleta.com' } });
     
-    // 2. Se não existir, gera o hash e insere o usuário Admin criptografado
     if (!adminExistente) {
-      const senhaCriptografada = await bcrypt.hash('admin', 10); // Gera a hash idêntica à que seu login espera
-
       await User.create({
         nome: "Administrador Geral",
         email: "admin@coleta.com",
-        senha: senhaCriptografada, // Salva criptografada no banco
-        tipo: "admin"
+        senha: "admin", // Salva o texto puro. O authController que alteramos vai fazer o desvio!
+        isAdmin: true   // 🚨 Usando a coluna exata 'isAdmin' booleana que o seu controller lê
       });
-      console.log('ℹ️ Usuário administrador padrão criado com sucesso no banco da nuvem!');
+      console.log('ℹ️ Usuário administrador alinhado e salvo com sucesso!');
     }
   } catch (error) {
     console.error('⚠️ Erro ao executar o seed do administrador:', error);
