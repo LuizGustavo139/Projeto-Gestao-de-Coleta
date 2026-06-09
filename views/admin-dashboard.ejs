@@ -45,7 +45,8 @@
                     <th>ID</th>
                     <th>Usuário</th>
                     <th>Ponto de Coleta</th>
-                    <th>Tipos de Resíduos</th> <th>Endereço do Usuário</th>
+                    <th>Tipos de Resíduos</th>
+                    <th>Endereço do Usuário</th>
                     <th>Data Agendada</th>
                     <th>Status</th>
                     <th>Ações</th>
@@ -67,19 +68,20 @@
                                 </span>
                             </td>
                             <td>
-                                <% if (agendamento.status === 'Pendente') { %>
-                                    <form action="/admin/agendamentos/<%= agendamento.id %>/status" method="POST" style="display: inline;">
-                                        <input type="hidden" name="novoStatus" value="Aprovado">
-                                        <button type="submit" class="btn btn-sm btn-primary" style="background-color: #28a745; border: none; padding: 5px 10px; color: white; cursor: pointer; border-radius: 4px; margin-right: 5px;">Aprovar</button>
-                                    </form>
-
-                                    <form action="/admin/agendamentos/<%= agendamento.id %>/status" method="POST" style="display: inline;">
-                                        <input type="hidden" name="novoStatus" value="Cancelado">
-                                        <button type="submit" class="btn btn-sm btn-danger" style="background-color: #dc3545; border: none; padding: 5px 10px; color: white; cursor: pointer; border-radius: 4px;">Cancelar</button>
-                                    </form>
-                                <% } else { %>
-                                    <span style="color: #6c757d; font-style: italic; font-size: 14px;">🔒 Finalizado</span>
-                                <% } %>
+                                <form action="/admin/agendamentos/<%= agendamento.id %>/status" method="POST" style="display: flex; align-items: center; gap: 5px;">
+                                    
+                                    <select name="novoStatus" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+                                        <option value="Pendente" <%= agendamento.status === 'Pendente' ? 'selected' : '' %>>Pendente</option>
+                                        <option value="Aprovado" <%= agendamento.status === 'Aprovado' ? 'selected' : '' %>>Aprovado</option>
+                                        <option value="Em Andamento" <%= agendamento.status === 'Em Andamento' ? 'selected' : '' %>>Em Andamento</option>
+                                        <option value="Concluído" <%= agendamento.status === 'Concluído' ? 'selected' : '' %>>Concluído</option>
+                                        <option value="Cancelado" <%= agendamento.status === 'Cancelado' ? 'selected' : '' %>>Cancelado</option>
+                                    </select>
+                                    
+                                    <button type="submit" class="btn btn-sm btn-primary" style="padding: 5px 10px; font-size: 13px; border-radius: 4px; border: none; background-color: #007bff; color: white; cursor: pointer;">
+                                        Atualizar
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <% }) %>
