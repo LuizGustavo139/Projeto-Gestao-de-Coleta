@@ -8,13 +8,14 @@
 <body>
   <%- include('../partials/navbar') %>
   <div class="container">
-    <div class="page-header">
-      <h2>♻️ Tipos de Resíduos</h2>
+    
+    <div class="page-header" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; margin-bottom: 30px;">
+      <h2 style="margin: 0; text-align: center;">♻️ Tipos de Resíduos</h2>
       <a href="/residuos/novo" class="btn btn-primary">+ Novo Resíduo</a>
     </div>
 
     <% if (residuos.length === 0) { %>
-      <p class="empty-msg">Nenhum resíduo cadastrado ainda.</p>
+      <p class="empty-msg" style="text-align: center;">Nenhum resíduo cadastrado ainda.</p>
     <% } else { %>
       <table class="tabela">
         <thead>
