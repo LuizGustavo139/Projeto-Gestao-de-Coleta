@@ -23,6 +23,7 @@ exports.criarAgendamento = async (req, res) => {
         }
         res.redirect('/pontos'); 
     } catch (erro) {
+        console.error(erro);
         res.status(500).send("Erro interno ao tentar agendar a coleta.");
     }
 };
@@ -38,7 +39,6 @@ exports.listarAgendamentosAdmin = async (req, res) => {
             order: [['createdAt', 'DESC']]
         });
 
-        // 🚨 AGRUPAMENTO DO ADMIN: Junta os resíduos do mesmo cidadão/ponto na mesma linha!
         const mapAgrupado = {};
         for (let ag of agendamentosBrutos) {
             const dado = ag.toJSON();
@@ -46,14 +46,19 @@ exports.listarAgendamentosAdmin = async (req, res) => {
             
             if (!mapAgrupado[chave]) {
                 dado.nomesResiduos = dado.residuo ? dado.residuo.nomeResiduo : 'Nenhum';
+                // Garante que a propriedade nomeUsuario exista para a tabela ler sem quebrar
+                dado.nomeUsuario = dado.User ? dado.User.nome : 'Usuário Desconhecido';
                 mapAgrupado[chave] = dado;
             } else {
-                mapAgrupado[chave].nomesResiduos += ', ' + (dado.residuo ? dado.residuo.nomeResiduo : '');
+                if (dado.residuo && dado.residuo.nomeResiduo) {
+                    mapAgrupado[chave].nomesResiduos += ', ' + dado.residuo.nomeResiduo;
+                }
             }
         }
 
         res.render('admin-dashboard', { agendamentos: Object.values(mapAgrupado) });
     } catch (erro) {
+        console.error(erro);
         res.status(500).send("Erro ao carregar os dados.");
     }
 };
@@ -65,7 +70,6 @@ exports.atualizarStatus = async (req, res) => {
 
         const agendamentoRaw = await Agendamento.findOne({ where: { id: id } });
         if (agendamentoRaw) {
-            // Atualiza o status do GRUPO INTEIRO de uma vez
             await Agendamento.update(
                 { status: novoStatus },
                 { where: { dataHora: agendamentoRaw.dataHora, PontoColetaId: agendamentoRaw.PontoColetaId, UserId: agendamentoRaw.UserId } }
@@ -74,6 +78,7 @@ exports.atualizarStatus = async (req, res) => {
 
         res.redirect('/admin/dashboard');
     } catch (erro) {
+        console.error(erro);
         res.status(500).send("Erro ao processar a alteração de status.");
     }
 };
