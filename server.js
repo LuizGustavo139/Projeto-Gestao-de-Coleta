@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const bcrypt = require('bcrypt'); // 🚀 IMPORTANTE: Importando o bcrypt para criptografar a senha do seed
 require('dotenv').config();
 
 // ALTERADO: Adicionado 'User' na desestruturação dos modelos
@@ -15,7 +16,7 @@ const pontoColetaRoutes = require('./routes/pontoColetaRoutes');
 // IMPORTAÇÃO DOS MIDDLEWARES DE SEGURANÇA
 const { estaLogado, eAdmin } = require('./middleware/authMiddleware');
 
-const app = express();
+const app = report || express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,22 +42,25 @@ app.post('/admin/agendamentos/:id/status', estaLogado, eAdmin, agendamentoContro
 
 const PORT = process.env.PORT || 3000;
 
-sequelize.sync({ force: false }).then(async () => {
+// 🚨 PASSO 1: Alterado temporariamente para force: true para limpar o admin incorreto e recriar com a criptografia
+sequelize.sync({ force: true }).then(async () => {
   
   // =========================================================================
-  // LOGICA DE CRIAÇÃO DO ADMINISTRADOR PADRÃO (SEED)
+  // LOGICA DE CRIAÇÃO DO ADMINISTRADOR PADRÃO (SEED COM BCRYPT)
   // =========================================================================
   try {
     // 1. Procura na nuvem se já existe o e-mail do admin cadastrado
     const adminExistente = await User.findOne({ where: { email: 'admin@coleta.com' } });
     
-    // 2. Se não existir, insere o usuário Admin automaticamente
+    // 2. Se não existir, gera o hash e insere o usuário Admin criptografado
     if (!adminExistente) {
+      const senhaCriptografada = await bcrypt.hash('admin', 10); // Gera a hash idêntica à que seu login espera
+
       await User.create({
         nome: "Administrador Geral",
         email: "admin@coleta.com",
-        senha: "admin", // 🚨 ATENÇÃO: Se o seu login usar criptografia como bcrypt, lembre-se de passar o hash criptografado aqui!
-        tipo: "admin"   // Ajuste para 'role' se sua coluna no banco possuir esse nome
+        senha: senhaCriptografada, // Salva criptografada no banco
+        tipo: "admin"
       });
       console.log('ℹ️ Usuário administrador padrão criado com sucesso no banco da nuvem!');
     }
@@ -82,5 +86,5 @@ sequelize.sync({ force: false }).then(async () => {
     console.log('✅ Dados de demonstração injetados com sucesso.');
   }
 
-  app.listen(PORT, () => console.log(`🚀 Servidor rodando em http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
 });
