@@ -3,42 +3,33 @@ const User = require('../models/User');
 const PontoColeta = require('../models/PontoColeta');
 const Residuo = require('../models/Residuo');
 
-// Função para o usuário comum criar um agendamento
 exports.criarAgendamento = async (req, res) => {
     try {
         let { pontoColetaId, residuoId, endereco, dataHora } = req.body;
-
-        // 🚨 BLINDAGEM 1: Se vier um Array (vários checkboxes marcados), 
-        // pegamos APENAS o primeiro ID para não quebrar o banco de dados relacional!
-        if (Array.isArray(residuoId)) residuoId = residuoId[0];
-        if (Array.isArray(pontoColetaId)) pontoColetaId = pontoColetaId[0];
-
-        // 🚨 BLINDAGEM 2: Pega o ID do usuário do nosso middleware de emergência 
-        // (Garante que nunca seja nulo)
+        
+        const listaResiduos = Array.isArray(residuoId) ? residuoId : [residuoId];
+        let idPontoLimpo = Array.isArray(pontoColetaId) ? pontoColetaId[0] : pontoColetaId;
         const userId = (req.user && req.user.id) ? req.user.id : 9999; 
 
-        // 🚨 BLINDAGEM 3: Insere valores padrão caso o formulário HTML não tenha enviado algo
-        await Agendamento.create({
-            dataHora: dataHora || new Date(), // Se vier sem data, põe a data/hora de agora
-            endereco: endereco || 'Ecoponto selecionado', // Se vier sem endereço, salva esse texto
-            status: 'Pendente',
-            UserId: userId,
-            PontoColetaId: pontoColetaId || 1, // Se falhar o ID do ponto, salva no Ponto 1
-            ResiduoId: residuoId || 1          // Se falhar o ID do resíduo, salva no Resíduo 1
-        });
-
-        // Agendamento salvo com sucesso absoluto! Redireciona de volta para a tela.
+        for (let id of listaResiduos) {
+            await Agendamento.create({
+                dataHora: dataHora || new Date(),
+                endereco: endereco || 'Ecoponto selecionado',
+                status: 'Pendente',
+                UserId: userId,
+                PontoColetaId: parseInt(idPontoLimpo, 10) || 1,
+                ResiduoId: parseInt(id, 10) || 1
+            });
+        }
         res.redirect('/pontos'); 
     } catch (erro) {
-        console.error("Erro CRÍTICO ao criar agendamento:", erro);
-        res.status(500).send("Erro interno ao tentar agendar a coleta. O erro está no console do Render.");
+        res.status(500).send("Erro interno ao tentar agendar a coleta.");
     }
 };
 
-// Função para o administrador listar os agendamentos
 exports.listarAgendamentosAdmin = async (req, res) => {
     try {
-        const agendamentos = await Agendamento.findAll({
+        const agendamentosBrutos = await Agendamento.findAll({
             include: [
                 { model: User },
                 { model: PontoColeta, as: 'pontoColeta' },
@@ -47,9 +38,22 @@ exports.listarAgendamentosAdmin = async (req, res) => {
             order: [['createdAt', 'DESC']]
         });
 
-        res.render('admin-dashboard', { agendamentos });
+        // 🚨 AGRUPAMENTO DO ADMIN: Junta os resíduos do mesmo cidadão/ponto na mesma linha!
+        const mapAgrupado = {};
+        for (let ag of agendamentosBrutos) {
+            const dado = ag.toJSON();
+            const chave = dado.dataHora + '-' + dado.PontoColetaId + '-' + dado.UserId;
+            
+            if (!mapAgrupado[chave]) {
+                dado.nomesResiduos = dado.residuo ? dado.residuo.nomeResiduo : 'Nenhum';
+                mapAgrupado[chave] = dado;
+            } else {
+                mapAgrupado[chave].nomesResiduos += ', ' + (dado.residuo ? dado.residuo.nomeResiduo : '');
+            }
+        }
+
+        res.render('admin-dashboard', { agendamentos: Object.values(mapAgrupado) });
     } catch (erro) {
-        console.error("Erro ao carregar o painel administrativo:", erro);
         res.status(500).send("Erro ao carregar os dados.");
     }
 };
@@ -59,14 +63,17 @@ exports.atualizarStatus = async (req, res) => {
         const { id } = req.params; 
         const { novoStatus } = req.body; 
 
-        await Agendamento.update(
-            { status: novoStatus },
-            { where: { id: id } }
-        );
+        const agendamentoRaw = await Agendamento.findOne({ where: { id: id } });
+        if (agendamentoRaw) {
+            // Atualiza o status do GRUPO INTEIRO de uma vez
+            await Agendamento.update(
+                { status: novoStatus },
+                { where: { dataHora: agendamentoRaw.dataHora, PontoColetaId: agendamentoRaw.PontoColetaId, UserId: agendamentoRaw.UserId } }
+            );
+        }
 
         res.redirect('/admin/dashboard');
     } catch (erro) {
-        console.error("Erro ao atualizar status:", erro);
         res.status(500).send("Erro ao processar a alteração de status.");
     }
 };
