@@ -22,15 +22,17 @@
         </select>
       </div>
 
-      <div class="form-group">
-        <label for="residuoId">Tipo de Resíduo *</label>
-        <select id="residuoId" name="residuoId" required>
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label><strong>Tipos de Resíduo (Selecione quantos desejar) *</strong></label>
+        <div style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; background-color: #fff;">
           <% residuos.forEach(res => { %>
-            <option value="<%= res.id %>" <%= agendamento.ResiduoId === res.id ? 'selected' : '' %>>
+            <label style="display: block; cursor: pointer; margin-bottom: 8px;">
+              <input type="checkbox" name="residuoId" value="<%= res.id %>"
+                <%= agendamento.residuoIdsSelecionados && agendamento.residuoIdsSelecionados.includes(res.id.toString()) ? 'checked' : '' %>>
               <%= res.nomeResiduo %>
-            </option>
+            </label>
           <% }) %>
-        </select>
+        </div>
       </div>
 
       <div class="form-group">
@@ -45,17 +47,14 @@
                value="<%= new Date(agendamento.dataHora).toISOString().slice(0,16) %>" required>
       </div>
 
-      <div class="form-group">
-        <label for="status">Status *</label>
-        <select id="status" name="status" required>
-          <option value="Pendente" <%= agendamento.status === 'Pendente' ? 'selected' : '' %>>Pendente</option>
-          <option value="Em Andamento" <%= agendamento.status === 'Em Andamento' ? 'selected' : '' %>>Em Andamento</option>
-          <option value="Concluído" <%= agendamento.status === 'Concluído' ? 'selected' : '' %>>Concluído</option>
-          <option value="Cancelado" <%= agendamento.status === 'Cancelado' ? 'selected' : '' %>>Cancelado</option>
-        </select>
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label><strong>Status Atual *</strong></label>
+        <input type="text" value="<%= agendamento.status %>" disabled 
+               style="background-color: #e9ecef; cursor: not-allowed; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-weight: bold;">
+        <small style="color: #6c757d; display: block; margin-top: 5px;">🔒 Apenas o administrador pode alterar o status da coleta.</small>
       </div>
 
-      <div class="form-actions">
+      <div class="form-actions" style="margin-top: 20px;">
         <button type="submit" class="btn btn-primary">Salvar Alterações</button>
         <a href="/pontos" class="btn btn-secondary">Voltar</a>
       </div>

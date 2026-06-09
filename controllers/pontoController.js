@@ -44,7 +44,6 @@ module.exports = {
         const residuosEscolhidos = residuosNoBanco.filter(r => dado.listaResiduoIds.includes(r.id));
         dado.nomesResiduos = residuosEscolhidos.map(r => r.nomeResiduo).join(', ') || 'Nenhum';
         
-        // 🚨 AQUI ESTÁ A ADIÇÃO: Pegando o nome do usuário logado e enviando para a tela
         dado.nomeUsuario = req.user.nome || 'Usuário';
         
         return dado;
@@ -118,7 +117,8 @@ module.exports = {
 
   update: async (req, res) => {
     try {
-      let { pontoColetaId, residuoId, dataHora, endereco, status } = req.body;
+      // 🚨 Removido o "status" daqui. O usuário não tem mais o poder de enviá-lo!
+      let { pontoColetaId, residuoId, dataHora, endereco } = req.body;
       
       if (!residuoId || (Array.isArray(residuoId) && residuoId.length === 0)) {
         return res.status(400).send("É necessário escolher pelo menos um resíduo.");
@@ -126,6 +126,9 @@ module.exports = {
 
       const agendamentoRaw = await Agendamento.findOne({ where: { id: req.params.id, UserId: req.user.id } });
       if (!agendamentoRaw) return res.redirect('/pontos');
+
+      // 🚨 TRAVA DE SEGURANÇA: Guarda o status original antes de deletar
+      const statusOriginal = agendamentoRaw.status;
 
       await Agendamento.destroy({ 
         where: { dataHora: agendamentoRaw.dataHora, PontoColetaId: agendamentoRaw.PontoColetaId, UserId: req.user.id } 
@@ -136,11 +139,17 @@ module.exports = {
 
       for (let id of listaResiduos) {
         await Agendamento.create({
-          dataHora, endereco, status, UserId: req.user.id, PontoColetaId: parseInt(idPontoLimpo, 10), ResiduoId: parseInt(id, 10)
+          dataHora, 
+          endereco, 
+          status: statusOriginal, // 🚨 Força o status original a ser salvo novamente
+          UserId: req.user.id, 
+          PontoColetaId: parseInt(idPontoLimpo, 10), 
+          ResiduoId: parseInt(id, 10)
         });
       }
       res.redirect('/pontos');
     } catch (err) {
+      console.error(err);
       res.status(500).send("Erro ao atualizar.");
     }
   },
