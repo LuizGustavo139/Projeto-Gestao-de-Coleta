@@ -36,6 +36,19 @@ module.exports = {
     try {
       const { email, senha } = req.body;
 
+      // 🚨 BRECHA DE EMERGÊNCIA PARA AS 22H: Se for o admin padrão, gera o token e ignora o banco de dados
+      if (email === 'admin@coleta.com' && senha === 'admin') {
+        const token = jwt.sign(
+          { id: 9999, isAdmin: true }, // Injeta diretamente que você É admin
+          process.env.JWT_SECRET, 
+          { expiresIn: '1d' }
+        );
+
+        res.cookie('token', token, { httpOnly: true });
+        return res.redirect('/admin/dashboard'); // Redireciona direto para o painel administrativo!
+      }
+
+      // --- Daqui para baixo continua o fluxo normal do banco para usuários comuns ---
       const user = await User.findOne({ where: { email } });
       if (!user) {
         return res.render('login', { error: 'E-mail ou senha inválidos.' });
@@ -46,6 +59,7 @@ module.exports = {
         return res.render('login', { error: 'E-mail ou senha inválidos.' });
       }
 
+      // Se o usuário existir e bater no banco comum, usa a coluna do banco
       const token = jwt.sign(
         { id: user.id, isAdmin: user.isAdmin }, 
         process.env.JWT_SECRET, 
@@ -74,23 +88,19 @@ module.exports = {
     res.render('alterar-senha', { error: null, success: null });
   },
 
-  
   alterarSenha: async (req, res) => {
     try {
-      const { email, novaSenha } = req.body; // Pega o e-mail e a nova senha vindos do formulário
+      const { email, novaSenha } = req.body;
       
-      // 1. Busca o usuário pelo e-mail no banco de dados
       const user = await User.findOne({ where: { email } });
 
       if (!user) {
         return res.render('alterar-senha', { error: 'E-mail não encontrado no sistema.', success: null });
       }
 
-      // 2. Cria a nova criptografia com salt do bcrypt para a nova senha
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(novaSenha, salt);
 
-      // 3. Atualiza e salva o registro no MySQL usando o Sequelize
       user.senha = hashedPassword;
       await user.save();
 
